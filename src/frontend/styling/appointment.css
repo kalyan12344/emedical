@@ -8,9 +8,9 @@
   transition: transform 0.3s;
 }
 
-.appointment-container:hover {
+/* .appointment-container:hover {
   transform: scale(1.02);
-}
+} */
 
 .title {
   font-family: "Roboto", sans-serif;
@@ -45,6 +45,7 @@ select:focus {
 }
 
 .book-button {
+  margin-top: 30px;
   background-color: #009688;
   color: white;
   font-size: 18px;
@@ -73,4 +74,16 @@ select:focus {
   .grid-container {
     grid-template-columns: 1fr;
   }
+}
+
+.viewAppointments-btn {
+  border-radius: 50%;
+  height: 100px;
+  width: 100px;
+  transform: translateY(90px);
+
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.viewAppointments-btn:hover {
+  background-color: rgb(6, 80, 163);
 }

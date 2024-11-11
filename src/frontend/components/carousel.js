@@ -2,7 +2,7 @@ import React from "react";
 import { Carousel } from "react-responsive-carousel";
 import { Box, Typography } from "@mui/material";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import "../styling/carousel.css"; // Import your custom CSS
+import "../styling/carousel.css"; 
 
 const TestimonialsCarousel = () => {
   const testimonials = [

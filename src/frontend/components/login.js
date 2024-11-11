@@ -2,12 +2,15 @@ import React, { useState } from "react";
 import "../styling/login.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import MessageScreen from "./messageScreen";
+import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
 
 const Login = () => {
   const navigate = useNavigate();
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
 
   // Signup Form State
   const [signupDetails, setSignupDetails] = useState({
@@ -23,15 +26,31 @@ const Login = () => {
     zipCode: "",
     emergencyName: "",
     emergencyPhone: "",
+    isDonor: false,
   });
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [user, setLoggedUser] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleSignupChange = (e) => {
     const { name, value } = e.target;
     setSignupDetails((prevDetails) => ({ ...prevDetails, [name]: value }));
+  };
+
+  const handleDonorChange = (e) => {
+    setSignupDetails((prevDetails) => ({
+      ...prevDetails,
+      isDonor: e.target.checked,
+    }));
+  };
+  const displayMessageAndNavigate = (message, userData) => {
+    setSuccessMessage(message);
+    setTimeout(() => {
+      setSuccessMessage("");
+      navigate("/landing", { state: { userData } });
+    }, 3000);
   };
 
   const handleLogin = async (e) => {
@@ -48,7 +67,8 @@ const Login = () => {
 
       setLoggedUser(data.user);
       const userData = data.user.user;
-      navigate("/landing", { state: { userData } });
+      setLoginError("");
+      displayMessageAndNavigate("Login Successful!", data.user.user);
 
       // Set user in state
 
@@ -88,10 +108,15 @@ const Login = () => {
         "http://localhost:5000/api/login",
         loginData
       );
-      console.log(response);
+      // console.log(response);
 
       return response.data;
     } catch (error) {
+      if (error.response && error.response.data && error.response.data.error) {
+        console.log(error.response.data.error);
+        setLoginError(error.response.data.error);
+      }
+
       throw new Error(error.response?.data?.error || "Login failed.");
     }
   };
@@ -109,6 +134,9 @@ const Login = () => {
     }
   };
 
+  if (successMessage) {
+    return <MessageScreen message={successMessage} />;
+  }
   return (
     <>
       <div className="wrapper ">
@@ -137,6 +165,10 @@ const Login = () => {
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                   />
+                  {loginError.length > 0 && (
+                    <p style={{ color: "red" }}>{loginError}</p>
+                  )}
+
                   <button className="flip-card__btn" onClick={handleLogin}>
                     Let’s go!
                   </button>
@@ -296,6 +328,17 @@ const Login = () => {
                       onChange={handleSignupChange}
                     />
                   </div>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={signupDetails.isDonor}
+                          onChange={handleDonorChange}
+                        />
+                      }
+                      label="Sign up as a Blood Donor"
+                    />
+                  </FormGroup>
                   <button className="flip-card__btn" onClick={handleSignup}>
                     Confirm!
                   </button>
@@ -304,10 +347,10 @@ const Login = () => {
             </div>
           </label>
         </div>
+
         {/* {isLoading && <p>Loading...</p>}
         {error && <p>Error: {error}</p>} */}
       </div>
-      <div>{/* {user?.name && <p>Welcome, {user.name}!</p>} */}</div>
     </>
   );
 };

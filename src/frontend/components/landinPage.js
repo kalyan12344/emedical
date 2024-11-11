@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../styling/landingPage.css";
 import TestimonialsCarousel from "./carousel";
-import Login from "./login";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
+import axios from "axios";
 import appointment from "../assets/appointment.png";
 import orderMed from "../assets/order medicines.png";
 import docVisit from "../assets/docVisit.png";
+import bloodDonate from "../assets/bloodDonate1.png";
 
 const MedicalLandingPage = () => {
   const location = useLocation();
@@ -14,13 +15,25 @@ const MedicalLandingPage = () => {
   const currentHour = new Date().getHours();
   let greeting;
 
-  if (currentHour < 12) {
-    greeting = "Good Morning";
-  } else if (currentHour < 18) {
-    greeting = "Good Afternoon";
-  } else {
-    greeting = "Good Evening";
-  }
+  const loadDoctors = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/doctors");
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || "Failed to load doctors.");
+    }
+  };
+
+  useEffect(() => {
+    loadDoctors();
+  }, []);
+
+  greeting =
+    currentHour < 12
+      ? "Good Morning"
+      : currentHour < 18
+      ? "Good Afternoon"
+      : "Good Evening";
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
@@ -60,7 +73,6 @@ const Header = ({ userData }) => {
           <ul className="nav-links">
             <li>
               <a
-                // href="#services"
                 className={activeLink === "services" ? "active" : ""}
                 onClick={() => handleLinkClick("services")}
               >
@@ -69,7 +81,6 @@ const Header = ({ userData }) => {
             </li>
             <li>
               <a
-                // href="#testimonials"
                 className={activeLink === "testimonials" ? "active" : ""}
                 onClick={() => handleLinkClick("testimonials")}
               >
@@ -78,7 +89,6 @@ const Header = ({ userData }) => {
             </li>
             <li>
               <a
-                // href="#appointment"
                 className={activeLink === "appointment" ? "active" : ""}
                 onClick={() => handleLinkClick("appointment")}
               >
@@ -87,11 +97,18 @@ const Header = ({ userData }) => {
             </li>
             <li>
               <a
-                // href="#buy-medicine"
                 className={activeLink === "buy-medicine" ? "active" : ""}
                 onClick={() => handleLinkClick("buy-medicine")}
               >
                 Buy Medicine
+              </a>
+            </li>
+            <li>
+              <a
+                className={activeLink === "blood-donor" ? "active" : ""}
+                onClick={() => handleLinkClick("blood-donor")}
+              >
+                Blood Donor
               </a>
             </li>
           </ul>
@@ -110,11 +127,27 @@ const MainContent = ({ userData, greeting }) => {
   const navigate = useNavigate();
 
   const handleBuyNowButton = () => {
-    navigate("/medicines", { state: { userData } });
+    if (!userData) {
+      navigate(`/login`);
+    } else {
+      navigate("/medicines", { state: { userData } });
+    }
   };
 
   const handleBookNow = () => {
-    navigate("/docAppointment", { state: { userData } });
+    if (!userData) {
+      navigate(`/login`);
+    } else {
+      navigate("/userAppointments", { state: { userData } });
+    }
+  };
+
+  const handleBloodDonorSignup = () => {
+    if (!userData) {
+      navigate(`/login`);
+    } else {
+      navigate("/bloodDonor", { state: { userData } });
+    }
   };
 
   return (
@@ -143,12 +176,9 @@ const MainContent = ({ userData, greeting }) => {
           <img src={docVisit} alt="Doctor Visit" />
         </div>
       </section>
+
       <section id="services" className="services">
-        <h1
-          style={{ display: "flex", justifyContent: "center", fontSize: "2em" }}
-        >
-          Services
-        </h1>
+        <h1 style={{ textAlign: "center", fontSize: "2em" }}>Services</h1>
         <div className="service-list">
           <div className="service-item">
             <h3>Online Consultations</h3>
@@ -164,28 +194,30 @@ const MainContent = ({ userData, greeting }) => {
           </div>
         </div>
       </section>
+
       <section id="testimonials">
         <TestimonialsCarousel userData={userData} />
       </section>
 
       <section id="appointment" className="appointment">
-        <h1
-          style={{ display: "flex", justifyContent: "center", fontSize: "2em" }}
-        >
+        <h1 style={{ textAlign: "center", fontSize: "2em" }}>
           Make an Appointment
         </h1>
         <div
           style={{
             height: "400px",
             display: "flex",
-            flexDirection: "row",
             justifyContent: "space-around",
             alignItems: "center",
           }}
         >
           <div>
-            <button className="appointment-button" onClick={handleBookNow}>
-              Book Now
+            <button
+              className="appointment-button"
+              onClick={handleBookNow}
+              style={{ width: "200px" }}
+            >
+              View / Book Appointment
             </button>
           </div>
           <div>
@@ -195,16 +227,13 @@ const MainContent = ({ userData, greeting }) => {
       </section>
 
       <section id="buy-medicine" className="appointment">
-        <h1
-          style={{ display: "flex", justifyContent: "center", fontSize: "2em" }}
-        >
+        <h1 style={{ textAlign: "center", fontSize: "2em" }}>
           Order Medicines
         </h1>
         <div
           style={{
             height: "400px",
             display: "flex",
-            flexDirection: "row",
             justifyContent: "space-around",
             alignItems: "center",
           }}
@@ -223,13 +252,41 @@ const MainContent = ({ userData, greeting }) => {
           </div>
         </div>
       </section>
+
+      <section id="blood-donor" className="appointment">
+        <h1 style={{ textAlign: "center", fontSize: "2em" }}>Blood Donation</h1>
+        <div
+          style={{
+            height: "400px",
+            display: "flex",
+            justifyContent: "space-around",
+            alignItems: "center",
+          }}
+        >
+          <div>
+            <img
+              style={{ height: "300px" }}
+              src={bloodDonate}
+              alt="Blood Donation"
+            />
+          </div>
+          <div>
+            <button
+              className="appointment-button"
+              onClick={handleBloodDonorSignup}
+            >
+              Find a Blood Donor
+            </button>
+          </div>
+        </div>
+      </section>
     </main>
   );
 };
 
 const Footer = () => {
   return (
-    <footer className="footer">
+    <footer className="footer" style={{ backgroundColor: "black" }}>
       <p>Contact Us: eMed@gmail.com | Phone: xxx-xxx-xxxx</p>
     </footer>
   );

@@ -46,7 +46,7 @@ h3 {
   color: #2a9d8f;
 }
 
-button {
+.cart-button {
   background-color: #007bff;
   color: white;
   border: none;
@@ -58,11 +58,11 @@ button {
   transition: background-color 0.3s ease-in-out;
   margin-left: 20px;
 }
-button:hover {
+.cart-button:hover {
   background-color: #21867a;
 }
 
-button:disabled {
+.cart-button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
 }
