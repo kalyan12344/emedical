@@ -1,3 +1,4 @@
+/* Container and Title Styling */
 .admin-doctors-container {
   width: 100vw;
   max-width: 1200px;
@@ -8,7 +9,7 @@
 
 .admin-doctors-title {
   text-align: center;
-  font-size: 24px;
+  font-size: 2rem;
   font-weight: bold;
   margin-bottom: 20px;
 }
@@ -18,6 +19,7 @@
   text-align: center;
 }
 
+/* Card Container */
 .doctor-cards-container {
   display: flex;
   flex-wrap: wrap;
@@ -25,6 +27,7 @@
   justify-content: center;
 }
 
+/* Card Styling */
 .doctor-card {
   background-color: #ffffff;
   border: 1px solid #e0e0e0;
@@ -42,11 +45,67 @@
 }
 
 .doctor-card h3 {
-  font-size: 18px;
+  font-size: 1.2rem;
   color: #333;
 }
 
 .doctor-card p {
   color: #666;
   margin: 5px 0;
+  font-size: 1rem;
+}
+
+/* Tablet View */
+@media (max-width: 768px) {
+  .admin-doctors-title {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+  }
+
+  .doctor-cards-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .doctor-card {
+    max-width: 90%;
+    width: 300px;
+    padding: 20px;
+    /* font-size: 30px; */
+  }
+
+  .doctor-card h3 {
+    font-size: 0.8rem;
+  }
+
+  .doctor-card p {
+    font-size: 1rem;
+  }
+}
+
+/* Mobile View */
+@media (max-width: 480px) {
+  .admin-doctors-container {
+    /* padding: 15px; */
+    width: 100vw;
+  }
+
+  .admin-doctors-title {
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+
+  .doctor-card {
+    /* max-width: 100%; */
+    padding: 15px;
+    width: 200px;
+  }
+
+  .doctor-card h3 {
+    font-size: 1rem;
+  }
+
+  .doctor-card p {
+    font-size: 0.85rem;
+  }
 }

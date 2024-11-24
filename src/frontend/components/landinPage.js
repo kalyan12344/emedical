@@ -8,6 +8,7 @@ import appointment from "../assets/appointment.png";
 import orderMed from "../assets/order medicines.png";
 import docVisit from "../assets/docVisit.png";
 import bloodDonate from "../assets/bloodDonate1.png";
+import RaiseIssueModal from "./raiseIssue";
 
 const MedicalLandingPage = () => {
   const location = useLocation();
@@ -39,7 +40,7 @@ const MedicalLandingPage = () => {
     <div style={{ display: "flex", flexDirection: "column" }}>
       <Header userData={userData} />
       <MainContent userData={userData} greeting={greeting} />
-      <Footer />
+      <Footer userData={userData} />
     </div>
   );
 };
@@ -138,7 +139,7 @@ const MainContent = ({ userData, greeting }) => {
     if (!userData) {
       navigate(`/login`);
     } else {
-      navigate("/userAppointments", { state: { userData } });
+      navigate("/docAppointment", { state: { userData } });
     }
   };
 
@@ -284,10 +285,41 @@ const MainContent = ({ userData, greeting }) => {
   );
 };
 
-const Footer = () => {
+const Footer = (userData) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [issueText, setIssueText] = useState("");
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleSubmitIssue = () => {
+    // You can integrate an API to handle issue submission here
+    console.log("Raised Issue:", issueText);
+    handleCloseModal(); // Close modal after submission
+  };
+
   return (
-    <footer className="footer" style={{ backgroundColor: "black" }}>
+    <footer
+      className="footer"
+      style={{
+        backgroundColor: "black",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+    >
       <p>Contact Us: eMed@gmail.com | Phone: xxx-xxx-xxxx</p>
+      <button style={{ backgroundColor: "red" }} onClick={handleOpenModal}>
+        Raise an Issue
+      </button>
+      {isModalOpen && (
+        <RaiseIssueModal userData={userData} onClose={handleCloseModal} />
+      )}
     </footer>
   );
 };

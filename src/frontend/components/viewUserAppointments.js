@@ -76,7 +76,7 @@ const UserAppointments = () => {
           display: "flex",
           justifyContent: "flex-end",
           marginTop: "30px",
-          marginRight: "30px",
+          marginLeft: "550px",
           transform: "translateY(52px)",
         }}
       >

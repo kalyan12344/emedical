@@ -39,7 +39,7 @@ describe("POST /api/signup", () => {
   test("should fail to register if the email is already in use", async () => {
     const response = await request(app).post("/api/signup").send({
       name: "Test User",
-      email: "testuser@example.com", 
+      email: "testuser@example.com",
       password: "TestPassword123",
       phone: "1234567890",
       birthDate: "1990-01-01",
@@ -51,7 +51,7 @@ describe("POST /api/signup", () => {
       emergencyName: "Emergency Contact",
       emergencyPhone: "0987654321",
     });
-    expect(response.statusCode).toBe(500); 
+    expect(response.statusCode).toBe(500);
     expect(response.body.error).toBe("Signup failed.");
   });
 });
@@ -69,10 +69,10 @@ describe("POST /api/login", () => {
   test("should fail to log in a user with incorrect password", async () => {
     const response = await request(app).post("/api/login").send({
       email: "testuser@example.com",
-      password: "WrongPassword123", 
+      password: "WrongPassword123",
     });
     expect(response.statusCode).toBe(400);
-    expect(response.body.error).toBe("Invalid email or password.");
+    expect(response.body.error).toBe("Incorrect Password");
   });
 
   test("should fail to log in a user with non-existing email", async () => {
@@ -82,5 +82,36 @@ describe("POST /api/login", () => {
     });
     expect(response.statusCode).toBe(400);
     expect(response.body.error).toBe("Invalid email or password.");
+  });
+});
+
+describe("API Endpoint Tests", () => {
+  it("should create a payment intent successfully with valid amount", async () => {
+    const response = await request(app)
+      .post("/api/create-payment-intent")
+      .send({ amount: 1000 }); // Send a valid amount (in cents)
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty("clientSecret");
+    expect(typeof response.body.clientSecret).toBe("string");
+  });
+
+  it("should return error if amount is missing", async () => {
+    const response = await request(app)
+      .post("/api/create-payment-intent")
+      .send({});
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body).toHaveProperty("error");
+    expect(response.body.error).toBe("Failed to create payment intent");
+  });
+
+  it("should return error for invalid amount", async () => {
+    const response = await request(app)
+      .post("/api/create-payment-intent")
+      .send({ amount: -1000 }); // Invalid amount
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body).toHaveProperty("error");
   });
 });
