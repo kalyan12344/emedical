@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../styling/userAppointment.css";
-import { Chip } from "@mui/material";
+import { Chip, Modal, TextField, Button, Rating } from "@mui/material";
 
 const UserAppointments = () => {
   const location = useLocation();
@@ -12,9 +12,65 @@ const UserAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [reviewText, setReviewText] = useState("");
+  const [rating, setRating] = useState(0);
+  const [reviewError , setReviewError] = useState("")
 
   const handleScheduleAppointments = () => {
     navigate("/docAppointment", { state: { userData } });
+  };
+
+  const handleOpenReviewModal = (appointment) => {
+    setSelectedAppointment(appointment);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedAppointment(null);
+    setReviewText("");
+    setRating(0); // Reset rating
+  };
+
+  const handleSubmitReview = async () => {
+    if (reviewText.trim() === "" || rating === 0) {
+      alert("Please provide both a review and a rating.");
+      return;
+    }
+
+    try {
+      // API call to save the review
+      await axios.post(
+        `http://localhost:5000/api/appointments/${selectedAppointment._id}/review`,
+        {
+          review: reviewText,
+          rating,
+        }
+      );
+
+      console.log("Review submitted:", { reviewText, rating });
+
+      // Optionally update the appointment list with the new review (not shown in UI here)
+      setAppointments((prevAppointments) =>
+        prevAppointments.map((appointment) =>
+          appointment._id === selectedAppointment._id
+            ? { ...appointment, review: reviewText, rating }
+            : appointment
+        )
+      );
+
+      handleCloseModal();
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        setReviewError(error.response.data.error); // Show error in modal
+      } else {
+        setReviewError("Failed to submit the review. Please try again.");
+      }
+  
+      console.error("Error submitting review:", error);
+    }
   };
 
   useEffect(() => {
@@ -38,7 +94,7 @@ const UserAppointments = () => {
     (appointment) => appointment.status === "Scheduled"
   );
   const completedAppointments = appointments.filter(
-    (appointment) => appointment.status === "completed"
+    (appointment) => appointment.status === "Completed"
   );
   const cancelledAppointments = appointments.filter(
     (appointment) => appointment.status === "Cancelled"
@@ -46,7 +102,7 @@ const UserAppointments = () => {
 
   const handleCancelAppointment = async (appointmentId) => {
     const cancellationNote = prompt("Please enter a cancellation note:");
-    if (!cancellationNote) return; // Exit if no note provided
+    if (!cancellationNote) return;
 
     try {
       await axios.put(
@@ -134,7 +190,17 @@ const UserAppointments = () => {
                     <p>Doctor: {appointment.doctorName || "Unknown"}</p>
                     <p>Notes: {appointment.notes || "N/A"}</p>
                   </div>
-                  <Chip label={appointment.status} />
+                  <div style={{ display: "flex", gap: "20px" }}>
+                    <Chip label={appointment.status} />
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      style={{borderRadius:"30px", width:"120px", height:"30px", fontSize:"12px"}}
+                      onClick={() => handleOpenReviewModal(appointment)}
+                    >
+                      Add Review
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -166,6 +232,54 @@ const UserAppointments = () => {
           )}
         </div>
       </div>
+
+      <Modal open={isModalOpen} onClose={handleCloseModal}>
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "400px",
+            backgroundColor: "white",
+            border: "2px solid #000",
+            boxShadow: 24,
+            padding: "20px",
+            borderRadius: "10px",
+          }}
+        >
+          <h3>Add Review</h3>
+          {reviewError && <p style={{ color: "red" }}>{reviewError}</p>}
+
+          <Rating
+            name="rating"
+            value={rating}
+            onChange={(event, newValue) => setRating(newValue)}
+            size="large"
+          />
+          <TextField
+            label="Your Review"
+            multiline
+            rows={4}
+            fullWidth
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value)}
+            style={{ marginTop: "20px" }}
+          />
+          <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSubmitReview}
+            >
+              Submit
+            </Button>
+            <Button variant="outlined" color="secondary" onClick={handleCloseModal}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

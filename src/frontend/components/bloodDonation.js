@@ -102,14 +102,14 @@ const BloodDonation = () => {
                   </button>
                 </div>
 
-                {/* Back Side */}
                 <div className="card-back">
-                  <h3>Donor Details</h3>
-                  <p>Name: {user.userId?.name}</p>
-                  <p>Phone: {user.userId?.phoneNumber}</p>
-                  <p>Street: {user.userId?.address?.street}</p>
-                  <p>City: {user.userId?.address?.city}</p>
-                  <p>State: {user.userId?.address?.state}</p>
+                {console.log("user in BD",user)}
+                  <h3 style={{color:"black"}}>Donor Details</h3>
+                  <p style={{color: "black"}}>Name: {user.userId?.name}</p>
+                  <p style={{color: "black"}}>Phone: {user.userId?.phoneNumber}</p>
+                  <p style={{color: "black"}}> Street: {user.userId?.address?.street}</p>
+                  <p style={{color: "black"}}>City: {user.userId?.address?.city}</p>
+                  <p style={{color: "black"}}>State: {user.userId?.address?.state}</p>
                   <p className="bgrp">Blood Group: {user.bloodGroup}</p>
                   <button
                     className="request-button"

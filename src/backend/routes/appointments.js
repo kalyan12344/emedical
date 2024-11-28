@@ -79,7 +79,7 @@ router.get("/api/appointments/user/:userId", async (req, res) => {
 
 router.get("/api/appointments/doctor/:doctorId", async (req, res) => {
   const { doctorId } = req.params;
-
+console.log(doctorId)
   try {
     // Find appointments based on the doctor ID
     const appointments = await Appointment.find({ doctorId }).populate(

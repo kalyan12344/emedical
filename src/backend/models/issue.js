@@ -11,8 +11,10 @@ const MessageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    isRead: { type: Boolean, default: false }, // Tracks if the message is read
-    timestamp: { type: Date, default: Date.now },
+    timestamp: {
+      type: Date,
+      default: Date.now, // Automatically set the timestamp for the message
+    },
   },
   { _id: false } // Disable _id for subdocuments
 );
@@ -36,6 +38,10 @@ const IssueThreadSchema = new mongoose.Schema(
       enum: ["open", "in progress", "resolved"],
       default: "open", // Default status is 'open'
     },
+    isRead: {
+      type: Boolean,
+      default: false, // Tracks if the entire thread has been read
+    },
     createdAt: {
       type: Date,
       default: Date.now, // Automatically set the created date
@@ -46,6 +52,7 @@ const IssueThreadSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
 
 const Issue = mongoose.model("IssueThread", IssueThreadSchema);
 

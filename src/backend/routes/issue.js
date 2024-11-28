@@ -2,7 +2,6 @@ const express = require("express");
 const IssueThread = require("../models/issue");
 const router = express.Router();
 
-// Create a new issue thread
 router.post("/api/issues", async (req, res) => {
   try {
     const { user, email, message } = req.body;
@@ -11,10 +10,28 @@ router.post("/api/issues", async (req, res) => {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const issueThread = new IssueThread({
+    // Check if an issue thread already exists for the user
+    let issueThread = await IssueThread.findOne({ user });
+
+    if (issueThread) {
+      // If an issue thread exists, add the new message
+      issueThread.messages.push({ sender: "user", message });
+      issueThread.isRead = false; // Mark the thread as unread
+      issueThread.updatedAt = new Date();
+
+      await issueThread.save();
+      return res.status(200).json({
+        message: "Message added to existing issue thread",
+        issueThread,
+      });
+    }
+
+    // Create a new issue thread if none exists
+    issueThread = new IssueThread({
       user,
       email,
       messages: [{ sender: "user", message }],
+      isRead: false,
     });
 
     await issueThread.save();
@@ -27,30 +44,64 @@ router.post("/api/issues", async (req, res) => {
   }
 });
 
-// Add a message to an issue thread
-// router.post("/api/issues/:id/messages", async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const { sender, message } = req.body;
 
-//     const issueThread = await IssueThread.findById(id);
-//     if (!issueThread) {
-//       return res.status(404).json({ error: "Issue thread not found" });
-//     }
+router.patch("/api/issues/user/:userId/mark-read", async (req, res) => {
+  const { userId } = req.params;
 
-//     issueThread.messages.push({ sender, message });
-//     issueThread.updatedAt = Date.now();
+  try {
+    const issue = await IssueThread.findOne({ user: userId });
+    if (!issue) {
+      return res.status(404).json({ error: "Issue thread not found" });
+    }
 
-//     await issueThread.save();
-//     res
-//       .status(200)
-//       .json({ message: "Message added successfully", issueThread });
-//   } catch (error) {
-//     res.status(400).json({ error: error.message });
-//   }
-// });
+    issue.isRead = true; // Mark the thread as read
+    issue.updatedAt = new Date();
 
-// Get all issue threads
+    await issue.save();
+
+    res.status(200).json({ message: "Issue marked as read", issue });
+  } catch (error) {
+    console.error("Error marking issue as read:", error);
+    res.status(500).json({ error: "Failed to mark issue as read" });
+  }
+});
+
+
+router.post("/api/issues/:userId/messages", async (req, res) => {
+  const { userId } = req.params;
+  const { sender, message } = req.body;
+
+  try {
+    if (!message || !sender) {
+      return res
+        .status(400)
+        .json({ error: "Sender and message are required." });
+    }
+
+    const issueThread = await IssueThread.findOne({ user: userId });
+    if (!issueThread) {
+      return res.status(404).json({ error: "Issue thread not found for the user." });
+    }
+
+    issueThread.messages.push({ sender, message, timestamp: new Date() });
+
+    if (sender === "admin") {
+      issueThread.isRead = true; // Mark the thread as read if admin replies
+    }
+
+    issueThread.updatedAt = new Date();
+    await issueThread.save();
+
+    res.status(200).json({
+      message: "Reply added successfully.",
+      updatedIssueThread: issueThread,
+    });
+  } catch (error) {
+    console.error("Error adding reply to issue thread:", error);
+    res.status(500).json({ error: "Failed to add reply to issue thread." });
+  }
+});
+
 router.get("/api/issues", async (req, res) => {
   try {
     const issues = await IssueThread.find().populate("user", "name email");
@@ -60,7 +111,6 @@ router.get("/api/issues", async (req, res) => {
   }
 });
 
-// Get a single issue thread
 router.get("/api/issues/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -78,13 +128,10 @@ router.get("/api/issues/:id", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-// Get issues by user ID
 router.get("/api/issues/user/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // Find issues related to the specific user
     const issues = await IssueThread.find({ user: userId }).populate(
       "user",
       "name email"
@@ -100,33 +147,6 @@ router.get("/api/issues/user/:userId", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-router.patch("/api/issues/user/:userId/mark-read", async (req, res) => {
-  const { userId } = req.params;
-  console.log("userId", userId);
-
-  try {
-    const issue = await IssueThread.findOne({ user: userId }); // Find the issue by user ID
-    if (!issue) {
-      return res.status(404).json({ error: "Issue not found" });
-    }
-
-    issue.messages.forEach((message) => {
-      if (message.sender === "user") {
-        message.isRead = true; // Mark all user messages as read
-      }
-    });
-
-    issue.updatedAt = new Date();
-    await issue.save();
-
-    res.status(200).json({ message: "Messages marked as read", issue });
-  } catch (error) {
-    console.error("Error marking messages as read:", error);
-    res.status(500).json({ error: "Failed to mark messages as read" });
-  }
-});
-
-// Update the status of an issue thread
 router.patch("/api/issues/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -134,7 +154,7 @@ router.patch("/api/issues/:id", async (req, res) => {
 
     const issueThread = await IssueThread.findByIdAndUpdate(
       id,
-      { status, updatedAt: Date.now() },
+      { status, updatedAt: new Date() },
       { new: true }
     );
 
@@ -150,41 +170,5 @@ router.patch("/api/issues/:id", async (req, res) => {
   }
 });
 
-router.post("/api/issues/:userId/messages", async (req, res) => {
-  const { userId } = req.params;
-  const { sender, message } = req.body;
-  console.log("Incoming request:", { userId, sender, message });
-
-  try {
-    if (!message || !sender) {
-      return res
-        .status(400)
-        .json({ error: "Sender and message are required." });
-    }
-
-    // Find the issue thread for the user
-    const issueThread = await IssueThread.findOne({ user: userId });
-
-    if (!issueThread) {
-      return res
-        .status(404)
-        .json({ error: "Issue thread not found for the user." });
-    }
-
-    // Add the new reply message
-    issueThread.messages.push({ sender, message, timestamp: new Date() });
-    issueThread.updatedAt = new Date();
-
-    await issueThread.save();
-
-    res.status(200).json({
-      message: "Reply added successfully.",
-      updatedIssueThread: issueThread,
-    });
-  } catch (error) {
-    console.error("Error adding reply to issue thread:", error);
-    res.status(500).json({ error: "Failed to add reply to issue thread." });
-  }
-});
 
 module.exports = router;

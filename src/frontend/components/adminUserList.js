@@ -9,6 +9,7 @@ const AdminUsers = () => {
   const [showModal, setShowModal] = useState(false);
   const [activeUserId, setActiveUserId] = useState(null);
   const [replyMessage, setReplyMessage] = useState("");
+  const [refreshData, setRefreshData] = useState(false);
 
   useEffect(() => {
     const fetchUsersAndMessages = async () => {
@@ -22,17 +23,11 @@ const AdminUsers = () => {
               const issuesResponse = await axios.get(
                 `http://localhost:5000/api/issues/user/${user._id}`
               );
-              const hasNewMessages = issuesResponse.data.some((issue) =>
-                issue.messages.some(
-                  (msg) => msg.sender === "user" && !msg.isRead
-                )
+              const hasNewMessages = issuesResponse.data.some(
+                (issue) => !issue.isRead
               );
               return { ...user, messages: issuesResponse.data, hasNewMessages };
             } catch (error) {
-              console.error(
-                `Failed to fetch issues for user ${user._id}:`,
-                error
-              );
               return { ...user, messages: [], hasNewMessages: false };
             }
           })
@@ -40,13 +35,12 @@ const AdminUsers = () => {
 
         setUsersWithMessages(usersWithIssues);
       } catch (error) {
-        console.error("Failed to fetch users or messages:", error);
         setError("Failed to load users. Please try again later.");
       }
     };
 
     fetchUsersAndMessages();
-  }, []);
+  }, [refreshData]);
 
   const handleCardClick = async (userId) => {
     setFlippedCards((prev) => ({ ...prev, [userId]: !prev[userId] }));
@@ -56,25 +50,8 @@ const AdminUsers = () => {
         await axios.patch(
           `http://localhost:5000/api/issues/user/${userId}/mark-read`
         );
-        setUsersWithMessages((prev) =>
-          prev.map((user) =>
-            user._id === userId
-              ? {
-                  ...user,
-                  hasNewMessages: false,
-                  messages: user.messages.map((issue) => ({
-                    ...issue,
-                    messages: issue.messages.map((msg) =>
-                      msg.sender === "user" ? { ...msg, isRead: true } : msg
-                    ),
-                  })),
-                }
-              : user
-          )
-        );
-      } catch (error) {
-        console.error("Failed to mark messages as read:", error);
-      }
+        setRefreshData((prev) => !prev);
+      } catch (error) {}
     }
   };
 
@@ -92,7 +69,6 @@ const AdminUsers = () => {
     if (!replyMessage.trim()) return;
 
     try {
-      console.log("Sending reply for user:", activeUserId);
       await axios.post(
         `http://localhost:5000/api/issues/${activeUserId}/messages`,
         {
@@ -100,28 +76,9 @@ const AdminUsers = () => {
           message: replyMessage,
         }
       );
-
-      setUsersWithMessages((prev) =>
-        prev.map((user) => {
-          if (user._id === activeUserId) {
-            const updatedMessages = [...user.messages];
-            if (updatedMessages.length > 0) {
-              updatedMessages[0].messages.push({
-                sender: "admin",
-                message: replyMessage,
-                isRead: false,
-              });
-            }
-            return { ...user, messages: updatedMessages };
-          }
-          return user;
-        })
-      );
-
+      setRefreshData((prev) => !prev);
       handleCloseModal();
-    } catch (error) {
-      console.error("Failed to send reply:", error);
-    }
+    } catch (error) {}
   };
 
   return (

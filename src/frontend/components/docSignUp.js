@@ -14,7 +14,6 @@ const DoctorSignup = () => {
     qualifications: "",
     experience: "",
     clinicAddress: "",
-    // availability: "",
     bloodDonor: false,
     emergencyName: "",
     emergencyPhone: "",
@@ -33,16 +32,19 @@ const DoctorSignup = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    console.log(signupDetails);
     try {
       const response = await axios.post(
         "http://localhost:5000/api/doctor/signup",
         signupDetails
       );
-      setSuccessMessage(response.data.message);
-      navigate(`/docLanding`, { state: { doctor: signupDetails } });
-      setErrorMessage(""); // Clear error message
+      setSuccessMessage("Signup successful! Redirecting to login...");
+      setErrorMessage("");
+
+      setTimeout(() => {
+        navigate("/DocLogin");
+      }, 2000);
     } catch (error) {
+      setSuccessMessage("");
       if (error.response && error.response.data) {
         setErrorMessage(error.response.data.error);
       } else {
@@ -54,6 +56,10 @@ const DoctorSignup = () => {
   return (
     <div className="signup-container">
       <h2>Doctor Signup</h2>
+    
+      {errorMessage && (
+        <p style={{ color: "red", marginBottom: "10px" }}>{errorMessage}</p>
+      )}
       <form className="signup-form" onSubmit={handleSignup}>
         <label>Name</label>
         <input
@@ -145,15 +151,6 @@ const DoctorSignup = () => {
           required
         />
 
-        {/* <label>Availability</label> */}
-        {/* <input
-          type="text"
-          name="availability"
-          value={signupDetails.availability}
-          onChange={handleSignupChange}
-          required
-        /> */}
-
         <div className="checkbox-label">
           <input
             type="checkbox"
@@ -181,8 +178,11 @@ const DoctorSignup = () => {
           onChange={handleSignupChange}
           required
         />
-
-        <button className="signup-btn" type="submit">
+  {successMessage && (
+        <p style={{ color: "green", marginBottom: "10px" }}>
+          {successMessage}
+        </p>
+      )}        <button className="signup-btn" type="submit">
           Sign Up
         </button>
       </form>

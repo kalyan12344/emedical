@@ -285,11 +285,18 @@ const MainContent = ({ userData, greeting }) => {
   );
 };
 
-const Footer = (userData) => {
+const Footer = ({ userData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [issueText, setIssueText] = useState("");
+  const [usersWithMessages, setUsersWithMessages] = useState([]);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const handleOpenModal = () => {
+    if (!userData) {
+      navigate("/login"); // Redirect to login page if not logged in
+      return;
+    }
     setIsModalOpen(true);
   };
 
@@ -298,9 +305,51 @@ const Footer = (userData) => {
   };
 
   const handleSubmitIssue = () => {
-    // You can integrate an API to handle issue submission here
     console.log("Raised Issue:", issueText);
     handleCloseModal(); // Close modal after submission
+  };
+
+  const handleViewMessages = async () => {
+    try {
+      const userResponse = await axios.get("http://localhost:5000/api/users");
+      const users = userResponse.data;
+
+      // Fetch issues for all users and associate them
+      const usersWithIssues = await Promise.all(
+        users.map(async (user) => {
+          try {
+            const issuesResponse = await axios.get(
+              `http://localhost:5000/api/issues/user/${user._id}`
+            );
+            const hasNewMessages = issuesResponse.data.some(
+              (issue) => !issue.isRead
+            );
+            return { ...user, messages: issuesResponse.data, hasNewMessages };
+          } catch (error) {
+            return { ...user, messages: [], hasNewMessages: false };
+          }
+        })
+      );
+
+      // Filter messages for the specific user
+      const specificUserMessages = usersWithIssues.find(
+        (user) => user._id === userData.userData._id
+      );
+
+      if (!specificUserMessages) {
+        console.error("No messages found for this user.");
+        setError("No messages found for this user.");
+        return;
+      }
+
+      console.log("Navigating to messages view...");
+      console.log("Specific User Messages:", specificUserMessages.messages);
+      setUsersWithMessages([specificUserMessages]);
+    } catch (error) {
+      setError("Failed to load messages. Please try again later.");
+      console.error("Error fetching user messages:", error);
+    }
+    console.log(usersWithMessages[0].messages[0].messages);
   };
 
   return (
@@ -318,10 +367,15 @@ const Footer = (userData) => {
         Raise an Issue
       </button>
       {isModalOpen && (
-        <RaiseIssueModal userData={userData} onClose={handleCloseModal} />
+        <RaiseIssueModal
+          userData={userData}
+          onClose={handleCloseModal}
+          onViewMessages={handleViewMessages}
+        />
       )}
     </footer>
   );
 };
+
 
 export default MedicalLandingPage;

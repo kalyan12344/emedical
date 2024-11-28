@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: "http://localhost:3000", // replace with your frontend's URL
+    origin: "http://localhost:3000", 
     credentials: true,
   })
 );
@@ -44,6 +44,7 @@ const appointmentRouter = require("./routes/appointments");
 const bloodDonorRouter = require("./routes/bloodDonor");
 const adminRouter = require("./routes/admin.js");
 const issueRouter = require("./routes/issue.js");
+const reviewRouter = require("./routes/reviews.js")
 require("../backend/scheduler.js");
 
 app.use(doctorRouter);
@@ -52,6 +53,7 @@ app.use(appointmentRouter);
 app.use(bloodDonorRouter);
 app.use(adminRouter);
 app.use(issueRouter);
+app.use(reviewRouter)
 
 app.post("/api/create-payment-intent", async (req, res) => {
   const { amount } = req.body;

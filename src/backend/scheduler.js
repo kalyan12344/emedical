@@ -28,7 +28,7 @@ const updateAppointmentStatus = async () => {
   }
 };
 
-// Schedule the job to run daily at midnight
+// Schedule the job to run every minute
 cron.schedule("0 0 * * *", updateAppointmentStatus);
 
 module.exports = updateAppointmentStatus;
