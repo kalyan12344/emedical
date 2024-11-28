@@ -11,10 +11,15 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(bodyParser.json());
+
 app.use(
   cors({
-    origin: "http://localhost:3000", 
-    credentials: true,
+    origin: [
+      "https://emedical.vercel.app", // Your frontend URL
+      "http://localhost:3000" // Allow localhost during development
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed HTTP methods
+    credentials: true, // Allow cookies if needed
   })
 );
 app.use(express.urlencoded({ extended: true }));
