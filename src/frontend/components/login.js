@@ -105,7 +105,7 @@ const Login = () => {
   const loginApi = async (loginData) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/login",
+        "https://emedical-backend.vercel.app//api/login",
         loginData
       );
       // console.log(response);
