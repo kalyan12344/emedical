@@ -6,7 +6,7 @@ const stripe = require("stripe");
 require("dotenv").config(); // Load environment variables from .env file
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 // Middleware
 app.use(bodyParser.json());
