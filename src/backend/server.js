@@ -18,6 +18,8 @@ app.use(
     credentials: true, // Allow cookies if needed
   })
 );
+app.options("*", cors()); // Preflight request handler
+
 app.use(express.urlencoded({ extended: true }));
 
 // MongoDB Connection
