@@ -12,11 +12,19 @@ const PORT = process.env.PORT;
 app.use(bodyParser.json());
 
 // Use CORS middleware
+const allowedOrigins = process.env.CORS_ORIGIN.split(",");
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN, // Allow multiple origins dynamically
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed HTTP methods
-    credentials: true, // Allow cookies
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
   })
 );
 
