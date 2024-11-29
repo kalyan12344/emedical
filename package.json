@@ -21,8 +21,11 @@
     "@mui/icons-material": "^5.15.7",
     "@mui/material": "^5.15.7",
     "@mui/styled-engine-sc": "^6.0.0-alpha.14",
+<<<<<<< HEAD
     "@stripe/react-stripe-js": "^3.0.0",
     "@stripe/stripe-js": "^5.2.0",
+=======
+>>>>>>> 388ca432ae6b81966a2d406c178d0dfd49f32fa0
     "@tabler/icons-react": "^2.47.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
