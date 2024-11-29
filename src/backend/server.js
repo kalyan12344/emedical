@@ -11,31 +11,14 @@ const PORT = process.env.PORT;
 // Middleware
 app.use(bodyParser.json());
 
+// Use CORS middleware
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN, // Allow multiple origins
+    origin: process.env.CORS_ORIGIN, // Allow multiple origins dynamically
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed HTTP methods
-    credentials: true, // Allow cookies if needed
+    credentials: true, // Allow cookies
   })
 );
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "https://emedical-frontend.onrender.com");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  next();
-});
-
-// Add preflight handling
-app.options("*", (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "https://emedical-frontend.onrender.com");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  res.sendStatus(204);
-});
-
-app.use(express.urlencoded({ extended: true }));
 
 // MongoDB Connection
 mongoose
