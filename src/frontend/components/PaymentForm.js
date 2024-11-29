@@ -22,7 +22,7 @@ const PaymentForm = () => {
       const {
         data: { clientSecret },
       } = await axios.post(
-        "http://localhost:5000/api/create-payment-intent",
+        "https://emedical-backend.onrender.com/api/create-payment-intent",
         { amount },
         { headers: { "Content-Type": "application/json" } }
       );

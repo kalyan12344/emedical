@@ -18,7 +18,9 @@ const MedicalLandingPage = () => {
 
   const loadDoctors = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/doctors");
+      const response = await axios.get(
+        "https://emedical-backend.onrender.com/api/doctors"
+      );
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.error || "Failed to load doctors.");
@@ -311,7 +313,9 @@ const Footer = ({ userData }) => {
 
   const handleViewMessages = async () => {
     try {
-      const userResponse = await axios.get("http://localhost:5000/api/users");
+      const userResponse = await axios.get(
+        "https://emedical-backend.onrender.com/api/users"
+      );
       const users = userResponse.data;
 
       // Fetch issues for all users and associate them
@@ -319,7 +323,7 @@ const Footer = ({ userData }) => {
         users.map(async (user) => {
           try {
             const issuesResponse = await axios.get(
-              `http://localhost:5000/api/issues/user/${user._id}`
+              `https://emedical-backend.onrender.com/api/issues/user/${user._id}`
             );
             const hasNewMessages = issuesResponse.data.some(
               (issue) => !issue.isRead
@@ -376,6 +380,5 @@ const Footer = ({ userData }) => {
     </footer>
   );
 };
-
 
 export default MedicalLandingPage;

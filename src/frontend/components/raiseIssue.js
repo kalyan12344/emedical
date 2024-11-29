@@ -9,13 +9,13 @@ const RaiseIssueModal = ({ userData, onClose }) => {
   const [issueMessage, setIssueMessage] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [newMessage, setNewMessage] = useState(false)
+  const [newMessage, setNewMessage] = useState(false);
 
   useEffect(() => {
     const fetchMessages = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/issues/user/${userData._id}`
+          `https://emedical-backend.onrender.com/api/issues/user/${userData._id}`
         );
         setMessages(response.data[0]?.messages || []);
       } catch (error) {
@@ -30,7 +30,7 @@ const RaiseIssueModal = ({ userData, onClose }) => {
     };
 
     fetchMessages();
-    console.log(messages)
+    console.log(messages);
   }, [userData, issueMessage]);
 
   const handleSubmit = async () => {
@@ -40,23 +40,24 @@ const RaiseIssueModal = ({ userData, onClose }) => {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/issues", {
-        user: userData._id,
-        email: userData.email,
-        message: issueMessage,
-      });
+      const response = await axios.post(
+        "https://emedical-backend.onrender.com/api/issues",
+        {
+          user: userData._id,
+          email: userData.email,
+          message: issueMessage,
+        }
+      );
       if (response.status === 201 || response.status === 200) {
         setSuccess("Issue raised successfully.");
-        setNewMessage(true)
+        setNewMessage(true);
         setError("");
-        setIssueMessage(""); 
+        setIssueMessage("");
       }
     } catch (error) {
       setError("Failed to raise issue. Please try again.");
       setSuccess("");
     }
-
-    
   };
 
   const handleToggleView = () => {
@@ -75,7 +76,9 @@ const RaiseIssueModal = ({ userData, onClose }) => {
               <div className="messages-container">
                 {messages.map((message, index) => (
                   <div key={index} className="message-card">
-                    <p style={{color:"black"}}><strong>{message.sender}:  </strong> {message.message}</p>
+                    <p style={{ color: "black" }}>
+                      <strong>{message.sender}: </strong> {message.message}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -98,13 +101,44 @@ const RaiseIssueModal = ({ userData, onClose }) => {
               className="issue-textarea"
             />
             <div className="modal-actions">
-              <button onClick={handleSubmit} className="submit-button" style={{height:"40px", width:"100px", display:"flex",justifyContent:"center", alignItems:"center"}}>
+              <button
+                onClick={handleSubmit}
+                className="submit-button"
+                style={{
+                  height: "40px",
+                  width: "100px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 Submit
               </button>
-              <button onClick={onClose} className="cancel-button" style={{height:"40px", width:"100px", display:"flex",justifyContent:"center", alignItems:"center"}}>
+              <button
+                onClick={onClose}
+                className="cancel-button"
+                style={{
+                  height: "40px",
+                  width: "100px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 Close
               </button>
-              <button onClick={handleToggleView} className="view-messages-button" style={{height:"40px", width:"100px", display:"flex",justifyContent:"center", alignItems:"center", fontSize:"12px"}}>
+              <button
+                onClick={handleToggleView}
+                className="view-messages-button"
+                style={{
+                  height: "40px",
+                  width: "100px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  fontSize: "12px",
+                }}
+              >
                 View Messages
               </button>
             </div>

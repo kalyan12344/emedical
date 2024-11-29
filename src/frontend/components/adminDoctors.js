@@ -10,7 +10,9 @@ const AdminDoctors = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/doctors");
+        const response = await axios.get(
+          "https://emedical-backend.onrender.com/api/doctors"
+        );
         setDoctors(response.data);
       } catch (error) {
         console.error("Failed to fetch doctors:", error);

@@ -1,5 +1,4 @@
 const express = require("express");
-const bcrypt = require("bcryptjs");
 const Doctor = require("../models/doc");
 
 const router = express.Router();
@@ -11,7 +10,7 @@ router.post("/api/doctor/signup", async (req, res) => {
     const {
       name,
       email,
-      password,
+      password, // Store plaintext password
       phoneNumber,
       birthDate,
       specialty,
@@ -19,20 +18,16 @@ router.post("/api/doctor/signup", async (req, res) => {
       qualifications,
       experience,
       clinicAddress,
-      // availability,
       bloodDonor,
       emergencyName,
       emergencyPhone,
     } = req.body;
 
-    // Hash the password before saving
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create a new Doctor
+    // Create a new Doctor without hashing the password
     const newDoctor = new Doctor({
       name,
       email,
-      password: hashedPassword,
+      password, // Save the password directly
       phoneNumber,
       birthDate,
       specialty,
@@ -40,7 +35,6 @@ router.post("/api/doctor/signup", async (req, res) => {
       qualifications,
       experience,
       clinicAddress,
-      // availability,
       bloodDonor,
       emergencyContact: {
         name: emergencyName,
@@ -67,9 +61,8 @@ router.post("/api/doctorLogin", async (req, res) => {
       return res.status(400).json({ error: "Invalid email or password." });
     }
 
-    // Check the password
-    const isPasswordValid = await bcrypt.compare(password, doctor.password);
-    if (!isPasswordValid) {
+    // Compare plaintext passwords
+    if (password !== doctor.password) {
       return res.status(400).json({ error: "Invalid email or password." });
     }
 
@@ -88,6 +81,7 @@ router.post("/api/doctorLogin", async (req, res) => {
   }
 });
 
+// Alternative Login API
 router.post("/api/doctor/login", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -96,8 +90,8 @@ router.post("/api/doctor/login", async (req, res) => {
       return res.status(400).json({ error: "Doctor not found." });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, doctor.password);
-    if (!isPasswordValid) {
+    // Compare plaintext passwords
+    if (password !== doctor.password) {
       return res.status(400).json({ error: "Invalid email or password." });
     }
 
@@ -107,6 +101,7 @@ router.post("/api/doctor/login", async (req, res) => {
   }
 });
 
+// Get All Doctors
 router.get("/api/doctors", async (req, res) => {
   try {
     const doctors = await Doctor.find();

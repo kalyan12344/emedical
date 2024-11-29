@@ -9,8 +9,7 @@ import axios from "axios";
 const DoctorLandingPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [doctor,setDoctor]= useState(location.state);
-
+  const [doctor, setDoctor] = useState(location.state);
 
   const [appointments, setAppointments] = useState([]);
   const [error, setError] = useState("");
@@ -19,9 +18,9 @@ const DoctorLandingPage = () => {
     password: doctor.doctor?.password,
   });
 
-const handleLogout = () => {
-  navigate(`/`)
-}
+  const handleLogout = () => {
+    navigate(`/`);
+  };
 
   // Additional state to store counts for appointment statuses
   const [appointmentCounts, setAppointmentCounts] = useState({
@@ -30,54 +29,52 @@ const handleLogout = () => {
     totalCompleted: 0,
     totalCancelled: 0,
   });
-console.log(doctor)
-// useEffect(() => {
-//   const loginAndFetchDoctor = async () => {
-//     try {
-//       const response = await axios.post(
-//         "http://localhost:5000/api/doctor/login",
-//         loginDetails
-//       );
+  console.log(doctor);
+  // useEffect(() => {
+  //   const loginAndFetchDoctor = async () => {
+  //     try {
+  //       const response = await axios.post(
+  //         "http://localhost:5000/api/doctor/login",
+  //         loginDetails
+  //       );
 
-//       setDoctor(response.data);
+  //       setDoctor(response.data);
 
-//       // // Fetch appointments
-//       // const appointmentsResponse = await axios.get(
-//       //   `http://localhost:5000/api/appointments/doctor/${response.data.doctor._id}`
-//       // );
-//       // const appointments = appointmentsResponse.data;
+  //       // // Fetch appointments
+  //       // const appointmentsResponse = await axios.get(
+  //       //   `http://localhost:5000/api/appointments/doctor/${response.data.doctor._id}`
+  //       // );
+  //       // const appointments = appointmentsResponse.data;
 
-//       // const totalScheduled = appointments.filter((app) => app.status === "Scheduled").length;
-//       // const totalCompleted = appointments.filter((app) => app.status === "Completed").length;
-//       // const totalCancelled = appointments.filter((app) => app.status === "Cancelled").length;
+  //       // const totalScheduled = appointments.filter((app) => app.status === "Scheduled").length;
+  //       // const totalCompleted = appointments.filter((app) => app.status === "Completed").length;
+  //       // const totalCancelled = appointments.filter((app) => app.status === "Cancelled").length;
 
-//       // setAppointments(appointments);
-//       // setAppointmentCounts({
-//       //   totalAppointments: appointments.length,
-//       //   totalScheduled,
-//       //   totalCompleted,
-//       //   totalCancelled,
-//       // });
-//     } catch (error) {
-//       setError("Failed to load doctor data. Please try again.");
-//     }
-//   };
+  //       // setAppointments(appointments);
+  //       // setAppointmentCounts({
+  //       //   totalAppointments: appointments.length,
+  //       //   totalScheduled,
+  //       //   totalCompleted,
+  //       //   totalCancelled,
+  //       // });
+  //     } catch (error) {
+  //       setError("Failed to load doctor data. Please try again.");
+  //     }
+  //   };
 
-//   loginAndFetchDoctor();
-//   console.log("geeting from login",doctor)
-// }, [loginDetails]);
-  
-
+  //   loginAndFetchDoctor();
+  //   console.log("geeting from login",doctor)
+  // }, [loginDetails]);
 
   useEffect(() => {
     const fetchAppointments = async () => {
-      console.log(doctor._id)
+      console.log(doctor._id);
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/appointments/doctor/${doctor.doctor._id}`
+          `https://emedical-backend.onrender.com/api/appointments/doctor/${doctor.doctor._id}`
         );
         const appointments = response.data;
-        console.log(response.data)
+        console.log(response.data);
 
         // Calculate totals for each status
         const totalScheduled = appointments.filter(
@@ -123,7 +120,9 @@ console.log(doctor)
             <a href="#contact">Contact</a>
           </li>
         </ul>
-        <button className="btn-login" onClick={handleLogout}>Logout</button>
+        <button className="btn-login" onClick={handleLogout}>
+          Logout
+        </button>
       </nav>
 
       <section className="hero">

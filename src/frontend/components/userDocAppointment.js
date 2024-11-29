@@ -34,7 +34,9 @@ const DoctorAppointment = () => {
 
   const loadDoctors = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/doctors");
+      const response = await axios.get(
+        "https://emedical-backend.onrender.com/api/doctors"
+      );
       setDoctorsList(response.data);
     } catch (error) {
       setError("Failed to load doctors. Please try again later.");
@@ -46,7 +48,7 @@ const DoctorAppointment = () => {
     console.log(formData);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/appointments",
+        "https://emedical-backend.onrender.com/api/appointments",
         formData
       );
       console.log("Appointment booked successfully:", response.data);

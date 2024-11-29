@@ -105,7 +105,7 @@ const Login = () => {
   const loginApi = async (loginData) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/login",
+        "https://emedical-backend.onrender.com/api/login",
         loginData
       );
       // console.log(response);
@@ -125,7 +125,7 @@ const Login = () => {
     console.log(signupData);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/signup",
+        "https://emedical-backend.onrender.com/api/signup",
         signupData
       );
       return response.data;

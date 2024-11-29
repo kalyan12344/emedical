@@ -16,7 +16,7 @@ const BloodDonation = () => {
     const fetchBloodDonors = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/bloodDonors"
+          "https://emedical-backend.onrender.com/api/bloodDonors"
         );
 
         // Filter out users with null userId and exclude the current user
@@ -103,13 +103,22 @@ const BloodDonation = () => {
                 </div>
 
                 <div className="card-back">
-                {console.log("user in BD",user)}
-                  <h3 style={{color:"black"}}>Donor Details</h3>
-                  <p style={{color: "black"}}>Name: {user.userId?.name}</p>
-                  <p style={{color: "black"}}>Phone: {user.userId?.phoneNumber}</p>
-                  <p style={{color: "black"}}> Street: {user.userId?.address?.street}</p>
-                  <p style={{color: "black"}}>City: {user.userId?.address?.city}</p>
-                  <p style={{color: "black"}}>State: {user.userId?.address?.state}</p>
+                  {console.log("user in BD", user)}
+                  <h3 style={{ color: "black" }}>Donor Details</h3>
+                  <p style={{ color: "black" }}>Name: {user.userId?.name}</p>
+                  <p style={{ color: "black" }}>
+                    Phone: {user.userId?.phoneNumber}
+                  </p>
+                  <p style={{ color: "black" }}>
+                    {" "}
+                    Street: {user.userId?.address?.street}
+                  </p>
+                  <p style={{ color: "black" }}>
+                    City: {user.userId?.address?.city}
+                  </p>
+                  <p style={{ color: "black" }}>
+                    State: {user.userId?.address?.state}
+                  </p>
                   <p className="bgrp">Blood Group: {user.bloodGroup}</p>
                   <button
                     className="request-button"

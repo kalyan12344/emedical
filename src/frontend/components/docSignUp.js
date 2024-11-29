@@ -34,7 +34,7 @@ const DoctorSignup = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/doctor/signup",
+        "https://emedical-backend.onrender.com/api/doctor/signup",
         signupDetails
       );
       setSuccessMessage("Signup successful! Redirecting to login...");
@@ -56,7 +56,7 @@ const DoctorSignup = () => {
   return (
     <div className="signup-container">
       <h2>Doctor Signup</h2>
-    
+
       {errorMessage && (
         <p style={{ color: "red", marginBottom: "10px" }}>{errorMessage}</p>
       )}
@@ -69,7 +69,6 @@ const DoctorSignup = () => {
           onChange={handleSignupChange}
           required
         />
-
         <label>Email</label>
         <input
           type="email"
@@ -78,7 +77,6 @@ const DoctorSignup = () => {
           onChange={handleSignupChange}
           required
         />
-
         <label>Password</label>
         <input
           type="password"
@@ -87,7 +85,6 @@ const DoctorSignup = () => {
           onChange={handleSignupChange}
           required
         />
-
         <label>Phone Number</label>
         <input
           type="text"
@@ -96,7 +93,6 @@ const DoctorSignup = () => {
           onChange={handleSignupChange}
           required
         />
-
         <label>Date of Birth</label>
         <input
           type="date"
@@ -105,7 +101,6 @@ const DoctorSignup = () => {
           onChange={handleSignupChange}
           required
         />
-
         <label>Specialty</label>
         <input
           type="text"
@@ -114,7 +109,6 @@ const DoctorSignup = () => {
           onChange={handleSignupChange}
           required
         />
-
         <label>License Number</label>
         <input
           type="text"
@@ -123,7 +117,6 @@ const DoctorSignup = () => {
           onChange={handleSignupChange}
           required
         />
-
         <label>Qualifications</label>
         <input
           type="text"
@@ -132,7 +125,6 @@ const DoctorSignup = () => {
           onChange={handleSignupChange}
           required
         />
-
         <label>Experience (Years)</label>
         <input
           type="number"
@@ -141,7 +133,6 @@ const DoctorSignup = () => {
           onChange={handleSignupChange}
           required
         />
-
         <label>Clinic Address</label>
         <input
           type="text"
@@ -150,7 +141,6 @@ const DoctorSignup = () => {
           onChange={handleSignupChange}
           required
         />
-
         <div className="checkbox-label">
           <input
             type="checkbox"
@@ -160,7 +150,6 @@ const DoctorSignup = () => {
           />
           <label>Sign up for blood donation</label>
         </div>
-
         <label>Emergency Contact Name</label>
         <input
           type="text"
@@ -169,7 +158,6 @@ const DoctorSignup = () => {
           onChange={handleSignupChange}
           required
         />
-
         <label>Emergency Contact Phone</label>
         <input
           type="text"
@@ -178,11 +166,12 @@ const DoctorSignup = () => {
           onChange={handleSignupChange}
           required
         />
-  {successMessage && (
-        <p style={{ color: "green", marginBottom: "10px" }}>
-          {successMessage}
-        </p>
-      )}        <button className="signup-btn" type="submit">
+        {successMessage && (
+          <p style={{ color: "green", marginBottom: "10px" }}>
+            {successMessage}
+          </p>
+        )}{" "}
+        <button className="signup-btn" type="submit">
           Sign Up
         </button>
       </form>

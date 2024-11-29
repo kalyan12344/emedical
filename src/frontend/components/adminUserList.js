@@ -14,14 +14,16 @@ const AdminUsers = () => {
   useEffect(() => {
     const fetchUsersAndMessages = async () => {
       try {
-        const userResponse = await axios.get("http://localhost:5000/api/users");
+        const userResponse = await axios.get(
+          "https://emedical-backend.onrender.com/api/users"
+        );
         const users = userResponse.data;
 
         const usersWithIssues = await Promise.all(
           users.map(async (user) => {
             try {
               const issuesResponse = await axios.get(
-                `http://localhost:5000/api/issues/user/${user._id}`
+                `https://emedical-backend.onrender.com/api/issues/user/${user._id}`
               );
               const hasNewMessages = issuesResponse.data.some(
                 (issue) => !issue.isRead
@@ -48,7 +50,7 @@ const AdminUsers = () => {
     if (!flippedCards[userId]) {
       try {
         await axios.patch(
-          `http://localhost:5000/api/issues/user/${userId}/mark-read`
+          `https://emedical-backend.onrender.com/api/issues/user/${userId}/mark-read`
         );
         setRefreshData((prev) => !prev);
       } catch (error) {}
@@ -70,7 +72,7 @@ const AdminUsers = () => {
 
     try {
       await axios.post(
-        `http://localhost:5000/api/issues/${activeUserId}/messages`,
+        `https://emedical-backend.onrender.com/api/issues/${activeUserId}/messages`,
         {
           sender: "admin",
           message: replyMessage,

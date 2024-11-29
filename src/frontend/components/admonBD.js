@@ -11,7 +11,7 @@ const AdminBloodDonors = () => {
     const fetchBloodDonors = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/bloodDonors"
+          "https://emedical-backend.onrender.com/api/bloodDonors"
         );
         // Only display donors with valid userId data
         const validDonors = response.data.filter(

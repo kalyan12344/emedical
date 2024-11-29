@@ -34,15 +34,7 @@ textarea.issue-textarea {
   border-radius: 5px;
   resize: none;
 }
-.message-card {
-  /* background: #f9f9f9; */
-  /* : black; */
-  margin: 10px 0;
-  padding: 10px;
-  border-radius: 5px;
-  text-align: left;
-  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
-}
+
 
 .modal-actions {
   display: flex;

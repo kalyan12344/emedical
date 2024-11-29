@@ -16,7 +16,7 @@ const UserAppointments = () => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState(0);
-  const [reviewError , setReviewError] = useState("")
+  const [reviewError, setReviewError] = useState("");
 
   const handleScheduleAppointments = () => {
     navigate("/docAppointment", { state: { userData } });
@@ -43,7 +43,7 @@ const UserAppointments = () => {
     try {
       // API call to save the review
       await axios.post(
-        `http://localhost:5000/api/appointments/${selectedAppointment._id}/review`,
+        `https://emedical-backend.onrender.com/api/appointments/${selectedAppointment._id}/review`,
         {
           review: reviewText,
           rating,
@@ -68,7 +68,7 @@ const UserAppointments = () => {
       } else {
         setReviewError("Failed to submit the review. Please try again.");
       }
-  
+
       console.error("Error submitting review:", error);
     }
   };
@@ -77,7 +77,7 @@ const UserAppointments = () => {
     const fetchAppointments = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/appointments/user/${userData?._id}`
+          `https://emedical-backend.onrender.com/api/appointments/user/${userData?._id}`
         );
         setAppointments(response.data);
       } catch (error) {
@@ -106,7 +106,7 @@ const UserAppointments = () => {
 
     try {
       await axios.put(
-        `http://localhost:5000/api/appointments/${appointmentId}/cancel`,
+        `https://emedical-backend.onrender.com/api/appointments/${appointmentId}/cancel`,
         { status: "Cancelled", notes: cancellationNote }
       );
 
@@ -195,7 +195,12 @@ const UserAppointments = () => {
                     <Button
                       variant="contained"
                       color="primary"
-                      style={{borderRadius:"30px", width:"120px", height:"30px", fontSize:"12px"}}
+                      style={{
+                        borderRadius: "30px",
+                        width: "120px",
+                        height: "30px",
+                        fontSize: "12px",
+                      }}
                       onClick={() => handleOpenReviewModal(appointment)}
                     >
                       Add Review
@@ -274,7 +279,11 @@ const UserAppointments = () => {
             >
               Submit
             </Button>
-            <Button variant="outlined" color="secondary" onClick={handleCloseModal}>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={handleCloseModal}
+            >
               Cancel
             </Button>
           </div>
