@@ -1,18 +1,15 @@
 const express = require("express");
-const bcrypt = require("bcrypt");
 const User = require("../models/user");
-
-const router = express.Router(); // Use express.Router()
-
-// Signup Route
+const router = express.Router();
 const BloodDonor = require("../models/bloodDonor");
 
+// Signup Route
 router.post("/api/signup", async (req, res) => {
   try {
     const {
       name,
       email,
-      password,
+      password, // Plaintext password
       phone: phoneNumber,
       birthDate: dateOfBirth,
       bloodGroup,
@@ -29,7 +26,7 @@ router.post("/api/signup", async (req, res) => {
     const newUser = new User({
       name,
       email,
-      password: await bcrypt.hash(password, 10),
+      password, // Save password as plaintext
       phoneNumber,
       dateOfBirth,
       bloodGroup,
@@ -63,25 +60,13 @@ router.post("/api/signup", async (req, res) => {
     res.status(500).json({ error: "Signup failed." });
   }
 });
-router.get("/api/users", async (req, res) => {
-  try {
-    // Fetch all users from the database
-    const users = await User.find({});
 
-    // Return the list of users
-    res.status(200).json(users);
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).json({ error: "Failed to fetch users." });
-  }
-});
 // Login Route
 router.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
     console.log("Attempting login for email:", email);
-    console.log("Entered password:", await bcrypt.hash(password, 10)); // Log the plain text password
 
     const user = await User.findOne({ email });
     console.log("User found:", user);
@@ -91,12 +76,8 @@ router.post("/api/login", async (req, res) => {
       return res.status(400).json({ error: "Invalid email or password." });
     }
 
-    // Check password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    console.log("Stored hashed password:", user.password); // Log hashed password from DB
-    console.log("Password valid:", isPasswordValid);
-
-    if (!isPasswordValid) {
+    // Check password (no hashing, directly compare plaintext passwords)
+    if (password !== user.password) {
       console.log("Password incorrect");
       return res.status(400).json({ error: "Incorrect Password" });
     }
@@ -112,4 +93,18 @@ router.post("/api/login", async (req, res) => {
   }
 });
 
-module.exports = router; // Fix the module export
+// Fetch All Users Route
+router.get("/api/users", async (req, res) => {
+  try {
+    // Fetch all users from the database
+    const users = await User.find({});
+
+    // Return the list of users
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ error: "Failed to fetch users." });
+  }
+});
+
+module.exports = router;
