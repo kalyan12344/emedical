@@ -6,27 +6,20 @@ const stripe = require("stripe");
 require("dotenv").config(); // Load environment variables from .env file
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(bodyParser.json());
 
-// Use CORS middleware
-const allowedOrigins = process.env.CORS_ORIGIN.split(",");
-
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true,
+    origin: process.env.CORS_ORIGIN.split(","), // Allow multiple origins
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed HTTP methods
+    credentials: true, // Allow cookies if needed
   })
 );
+
+app.use(express.urlencoded({ extended: true }));
 
 // MongoDB Connection
 mongoose
@@ -54,6 +47,7 @@ const bloodDonorRouter = require("./routes/bloodDonor");
 const adminRouter = require("./routes/admin.js");
 const issueRouter = require("./routes/issue.js");
 const reviewRouter = require("./routes/reviews.js");
+const orderRouter = require("./routes/orders.js");
 require("../backend/scheduler.js");
 
 app.use(doctorRouter);
@@ -63,6 +57,7 @@ app.use(bloodDonorRouter);
 app.use(adminRouter);
 app.use(issueRouter);
 app.use(reviewRouter);
+app.use(orderRouter);
 
 // Stripe Payment Intent
 app.post("/api/create-payment-intent", async (req, res) => {
