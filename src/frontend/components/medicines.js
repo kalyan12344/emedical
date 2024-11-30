@@ -52,7 +52,9 @@ const MedicinePage = () => {
       return newCart;
     });
   };
-
+  const handleViewOrders = () => {
+    navigate(`/userOrders`, { state: { userData } });
+  };
   const handlePageChange = (event, value) => setCurrentPage(value);
 
   const handleCheckout = () => {
@@ -87,13 +89,36 @@ const MedicinePage = () => {
   return (
     <div className="medicine-container">
       <h1>Available Medicines</h1>
-      <input
-        type="text"
-        placeholder="Search for a medicine..."
-        value={searchTerm}
-        onChange={handleSearch}
-        className="search"
-      />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Search for a medicine..."
+          value={searchTerm}
+          onChange={handleSearch}
+          className="search"
+        />
+        <button
+          style={{
+            display: "flex",
+            alignItems: "center",
+            transform: "translateY(-10px)",
+            height: "40px",
+            width: "150px",
+            marginLeft: "50px",
+            fontSize: "14px",
+          }}
+          onClick={handleViewOrders}
+        >
+          view orders
+        </button>
+      </div>
+
       <div className="medicine-list">
         {currentMedicines.map((medicine) => {
           const quantity = cart.get(medicine.id)?.quantity || 0;
