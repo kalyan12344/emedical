@@ -20,7 +20,7 @@ router.get("/api/admin/metrics", async (req, res) => {
       status: "Scheduled",
     });
     const completedAppointments = await Appointment.countDocuments({
-      status: "completed",
+      status: "Completed",
     });
     const cancelledAppointments = await Appointment.countDocuments({
       status: "Cancelled",
