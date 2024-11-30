@@ -50,12 +50,29 @@ const PaymentForm = () => {
       } else if (paymentResult.paymentIntent.status === "succeeded") {
         setError(null);
         setSuccessMessage(
-          `Payment of ${state?.totalPrice} is successful! Redirecting to your dashboard... \n Your order will be delivered to ${userData?.address?.street}, ${userData?.address?.city}`
+          `Payment of ${state?.totalPrice} is successful! Redirecting to your dashboard...`
+        );
+
+        // Save order details to the backend
+        const orderData = {
+          userId: userData?._id,
+          items: state?.cart,
+          totalPrice: state?.totalPrice,
+          paymentStatus: "Completed",
+          deliveryAddress: userData?.address,
+        };
+        console.log(orderData);
+        await axios.post(
+          "https://emedical-backend.onrender.com/api/orders",
+          orderData,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
         );
 
         setTimeout(() => {
           navigate("/landing", { state: { userData } });
-        }, 6000); // Redirect after 3 seconds
+        }, 6000); // Redirect after 6 seconds
       }
     } catch (error) {
       console.error("Payment error:", error);
