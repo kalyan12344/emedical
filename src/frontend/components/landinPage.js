@@ -13,13 +13,14 @@ import RaiseIssueModal from "./raiseIssue";
 const MedicalLandingPage = () => {
   const location = useLocation();
   const { userData } = location.state || {};
+  console.log(userData, "from main ");
   const currentHour = new Date().getHours();
   let greeting;
 
   const loadDoctors = async () => {
     try {
       const response = await axios.get(
-        "https://emedical-backend.onrender.com/api/doctors"
+        "https://emedical-frontend.onrender.com//api/doctors"
       );
       return response.data;
     } catch (error) {
@@ -288,74 +289,64 @@ const MainContent = ({ userData, greeting }) => {
 };
 
 const Footer = ({ userData }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  console.log(userData, "from footer");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isRaiseIssueModalOpen, setIsRaiseIssueModalOpen] = useState(false);
+  const [formData, setFormData] = useState({});
   const [issueText, setIssueText] = useState("");
-  const [usersWithMessages, setUsersWithMessages] = useState([]);
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleOpenModal = () => {
+  const handleOpenEditModal = () => {
     if (!userData) {
-      navigate("/login"); // Redirect to login page if not logged in
+      navigate("/login"); // Redirect to login if not logged in
       return;
     }
-    setIsModalOpen(true);
+    setFormData(userData); // Populate form with current user data
+    setIsEditModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmitEdit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.patch(
+        `https://emedical-frontend.onrender.com/api/users/${userData._id}`,
+        formData
+      );
+      console.log("Updated user:", response.data);
+      alert("Profile updated successfully!");
+      handleCloseEditModal();
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("Failed to update profile. Please try again.");
+    }
+  };
+
+  const handleOpenRaiseIssueModal = () => {
+    if (!userData) {
+      navigate("/login");
+      return;
+    }
+    setIsRaiseIssueModalOpen(true);
+  };
+
+  const handleCloseRaiseIssueModal = () => {
+    setIsRaiseIssueModalOpen(false);
   };
 
   const handleSubmitIssue = () => {
     console.log("Raised Issue:", issueText);
-    handleCloseModal(); // Close modal after submission
+    handleCloseRaiseIssueModal();
   };
-
-  const handleViewMessages = async () => {
-    try {
-      const userResponse = await axios.get(
-        "https://emedical-backend.onrender.com/api/users"
-      );
-      const users = userResponse.data;
-
-      // Fetch issues for all users and associate them
-      const usersWithIssues = await Promise.all(
-        users.map(async (user) => {
-          try {
-            const issuesResponse = await axios.get(
-              `https://emedical-backend.onrender.com/api/issues/user/${user._id}`
-            );
-            const hasNewMessages = issuesResponse.data.some(
-              (issue) => !issue.isRead
-            );
-            return { ...user, messages: issuesResponse.data, hasNewMessages };
-          } catch (error) {
-            return { ...user, messages: [], hasNewMessages: false };
-          }
-        })
-      );
-
-      // Filter messages for the specific user
-      const specificUserMessages = usersWithIssues.find(
-        (user) => user._id === userData.userData._id
-      );
-
-      if (!specificUserMessages) {
-        console.error("No messages found for this user.");
-        setError("No messages found for this user.");
-        return;
-      }
-
-      console.log("Navigating to messages view...");
-      console.log("Specific User Messages:", specificUserMessages.messages);
-      setUsersWithMessages([specificUserMessages]);
-    } catch (error) {
-      setError("Failed to load messages. Please try again later.");
-      console.error("Error fetching user messages:", error);
-    }
-    console.log(usersWithMessages[0].messages[0].messages);
-  };
-
+  console.log(formData);
   return (
     <footer
       className="footer"
@@ -367,15 +358,165 @@ const Footer = ({ userData }) => {
       }}
     >
       <p>Contact Us: eMed@gmail.com | Phone: xxx-xxx-xxxx</p>
-      <button style={{ backgroundColor: "red" }} onClick={handleOpenModal}>
-        Raise an Issue
-      </button>
-      {isModalOpen && (
-        <RaiseIssueModal
-          userData={userData}
-          onClose={handleCloseModal}
-          onViewMessages={handleViewMessages}
-        />
+      <div style={{ display: "flex", gap: "10px" }}>
+        <button onClick={handleOpenEditModal}>Edit Profile</button>
+        <button
+          style={{ backgroundColor: "red" }}
+          onClick={handleOpenRaiseIssueModal}
+        >
+          Raise an Issue
+        </button>
+      </div>
+
+      {/* Edit Profile Modal */}
+      {isEditModalOpen && (
+        <div
+          className="modal-overlay"
+          style={{ translate: "transformY(150px)" }}
+        >
+          <div
+            className="modal-content"
+            style={{ translate: "transformY(-150px)" }}
+          >
+            <h2>Edit Profile</h2>
+            <form onSubmit={handleSubmitEdit}>
+              <label>
+                Name:
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name || ""}
+                  onChange={handleInputChange}
+                />
+              </label>
+              <label>
+                Email:
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email || ""}
+                  onChange={handleInputChange}
+                />
+              </label>
+              <label>
+                Phone:
+                <input
+                  type="text"
+                  name="phoneNumber"
+                  value={formData.phoneNumber || ""}
+                  onChange={handleInputChange}
+                />
+              </label>
+              <label>
+                Address:
+                <input
+                  type="text"
+                  name="street"
+                  placeholder="Street"
+                  value={formData.address?.street || ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      address: { ...prev.address, street: e.target.value },
+                    }))
+                  }
+                />
+                <input
+                  type="text"
+                  name="city"
+                  placeholder="City"
+                  value={formData.address?.city || ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      address: { ...prev.address, city: e.target.value },
+                    }))
+                  }
+                />
+                <input
+                  type="text"
+                  name="state"
+                  placeholder="State"
+                  value={formData.address?.state || ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      address: { ...prev.address, state: e.target.value },
+                    }))
+                  }
+                />
+                <input
+                  type="text"
+                  name="zipCode"
+                  placeholder="Zip Code"
+                  value={formData.address?.zipCode || ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      address: { ...prev.address, zipCode: e.target.value },
+                    }))
+                  }
+                />
+                <input
+                  type="text"
+                  name="emergency name"
+                  placeholder="emergency contact name"
+                  value={formData.emergencyContact?.name || ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      emergencyContact: {
+                        ...prev.emergencyContact,
+                        name: e.target.value,
+                      },
+                    }))
+                  }
+                />
+                <input
+                  type="text"
+                  name="emergency phone"
+                  placeholder="emergency contact number"
+                  value={formData.emergencyContact?.phoneNumber || ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      emergencyContact: {
+                        ...prev.emergencyContact,
+                        phoneNumber: e.target.value,
+                      },
+                    }))
+                  }
+                />
+              </label>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <button type="submit">Save Changes</button>
+                <button type="button" onClick={handleCloseEditModal}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Raise Issue Modal */}
+      {isRaiseIssueModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Raise an Issue</h2>
+            <textarea
+              value={issueText}
+              onChange={(e) => setIssueText(e.target.value)}
+              placeholder="Describe your issue here..."
+              rows="4"
+              style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
+            />
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <button onClick={handleSubmitIssue}>Submit</button>
+              <button onClick={handleCloseRaiseIssueModal}>Cancel</button>
+            </div>
+          </div>
+        </div>
       )}
     </footer>
   );
