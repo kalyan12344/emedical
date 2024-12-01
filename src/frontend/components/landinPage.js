@@ -20,7 +20,7 @@ const MedicalLandingPage = () => {
   const loadDoctors = async () => {
     try {
       const response = await axios.get(
-        "https://emedical-frontend.onrender.com/api/doctors"
+        "https://emedical-backend.onrender.com/api/doctors"
       );
       return response.data;
     } catch (error) {
@@ -318,7 +318,7 @@ const Footer = ({ userData }) => {
     e.preventDefault();
     try {
       const response = await axios.patch(
-        `https://emedical-frontend.onrender.com/api/users/${userData._id}`,
+        `https://emedical-backend.onrender.com/api/users/${userData._id}`,
         formData
       );
       console.log("Updated user:", response.data);
