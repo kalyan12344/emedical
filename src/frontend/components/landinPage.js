@@ -20,7 +20,7 @@ const MedicalLandingPage = () => {
   const loadDoctors = async () => {
     try {
       const response = await axios.get(
-        "https://emedical-frontend.onrender.com//api/doctors"
+        "https://emedical-frontend.onrender.com/api/doctors"
       );
       return response.data;
     } catch (error) {
