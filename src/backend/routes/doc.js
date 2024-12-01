@@ -10,7 +10,7 @@ router.post("/api/doctor/signup", async (req, res) => {
     const {
       name,
       email,
-      password, // Store plaintext password
+      password,
       phoneNumber,
       birthDate,
       specialty,
@@ -27,7 +27,7 @@ router.post("/api/doctor/signup", async (req, res) => {
     const newDoctor = new Doctor({
       name,
       email,
-      password, // Save the password directly
+      password, 
       phoneNumber,
       birthDate,
       specialty,
@@ -61,12 +61,10 @@ router.post("/api/doctorLogin", async (req, res) => {
       return res.status(400).json({ error: "Invalid email or password." });
     }
 
-    // Compare plaintext passwords
     if (password !== doctor.password) {
       return res.status(400).json({ error: "Invalid email or password." });
     }
 
-    // If successful, respond with doctor information
     res.json({
       message: "Login successful",
       doctor: {
@@ -81,7 +79,31 @@ router.post("/api/doctorLogin", async (req, res) => {
   }
 });
 
-// Alternative Login API
+router.delete("/api/doctors/:doctorId", async (req, res) => {
+  const { doctorId } = req.params;
+  console.log("called");
+  try {
+    // Find and delete the doctor
+    const doctor = await Doctor.findByIdAndDelete(doctorId);
+
+    if (!doctor) {
+      return res.status(404).json({ error: "Doctor not found." });
+    }
+
+    res.json({
+      message: "Doctor deleted successfully.",
+      deletedDoctor: {
+        id: doctor._id,
+        name: doctor.name,
+        email: doctor.email,
+        specialty: doctor.specialty,
+      },
+    });
+  } catch (error) {
+    console.error("Error deleting doctor:", error);
+    res.status(500).json({ error: "Failed to delete doctor." });
+  }
+});
 router.post("/api/doctor/login", async (req, res) => {
   const { email, password } = req.body;
   try {
