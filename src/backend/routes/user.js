@@ -63,6 +63,7 @@ router.post("/api/signup", async (req, res) => {
 
 // Login Route
 router.post("/api/login", async (req, res) => {
+  console.log(req.body);
   const { email, password } = req.body;
 
   try {
@@ -90,6 +91,89 @@ router.post("/api/login", async (req, res) => {
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ error: "Login failed." });
+  }
+});
+router.delete("/api/users/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Find and delete the user
+    const user = await User.findByIdAndDelete(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // If the user is a blood donor, delete the corresponding blood donor entry
+    if (user.isDonor) {
+      await BloodDonor.findOneAndDelete({ userId: user._id });
+    }
+
+    res.json({
+      message: "User deleted successfully.",
+      deletedUser: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ error: "Failed to delete user." });
+  }
+});
+
+// Edit User Route
+router.patch("/api/users/:userId", async (req, res) => {
+  console.log(req.body.emergencyContact);
+  const { userId } = req.params; // Extract the user ID from the route parameter
+  const {
+    name,
+    email,
+    phoneNumber,
+    dateOfBirth,
+    bloodGroup,
+    address, // Full address object
+    emergencyContact,
+    isDonor,
+  } = req.body;
+  console.log(emergencyContact);
+  try {
+    // Find the user and update fields
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        name,
+        email,
+        phoneNumber,
+        dateOfBirth,
+        bloodGroup,
+        address: {
+          street: address?.street,
+          city: address?.city,
+          state: address?.state,
+          zipCode: address?.zipCode,
+        },
+        emergencyContact: {
+          name: emergencyContact?.name,
+          phoneNumber: emergencyContact?.phoneNumber,
+        },
+        isDonor,
+      },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    res.status(200).json({
+      message: "User updated successfully.",
+      updatedUser,
+    });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ error: "Failed to update user." });
   }
 });
 
