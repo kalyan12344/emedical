@@ -21,6 +21,7 @@ const CartPage = () => {
     navigate("/payment", {
       state: { cart, userData, totalPrice },
     });
+    setCart([])
   };
 
   const totalPrice = cart
