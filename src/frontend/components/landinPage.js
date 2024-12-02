@@ -499,24 +499,11 @@ const Footer = ({ userData }) => {
         </div>
       )}
 
-      {/* Raise Issue Modal */}
-      {isRaiseIssueModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>Raise an Issue</h2>
-            <textarea
-              value={issueText}
-              onChange={(e) => setIssueText(e.target.value)}
-              placeholder="Describe your issue here..."
-              rows="4"
-              style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
-            />
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <button onClick={handleSubmitIssue}>Submit</button>
-              <button onClick={handleCloseRaiseIssueModal}>Cancel</button>
-            </div>
-          </div>
-        </div>
+       {isRaiseIssueModalOpen && (
+        <RaiseIssueModal
+          userData={userData}
+          onClose={handleCloseRaiseIssueModal}
+        />
       )}
     </footer>
   );
