@@ -7,18 +7,20 @@ const PaymentForm = () => {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
   const { state } = useLocation();
   const amount = Math.round(state?.totalPrice * 100);
   const userData = state.userData;
+
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handlePayment = async (event) => {
     event.preventDefault();
     setIsLoading(true);
 
     try {
+      // Create payment intent
       const {
         data: { clientSecret },
       } = await axios.post(
@@ -35,6 +37,7 @@ const PaymentForm = () => {
         return;
       }
 
+      // Confirm payment
       const paymentResult = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: cardElement,
@@ -60,15 +63,12 @@ const PaymentForm = () => {
           totalPrice: state?.totalPrice,
           paymentStatus: "Completed",
           deliveryAddress: userData?.address,
+          userData: userData,
         };
-        console.log(orderData);
-        await axios.post(
-          "https://emedical-backend.onrender.com/api/orders",
-          orderData,
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
+
+        await axios.post("https://emedical-backend.onrender.com/api/orders", orderData, {
+          headers: { "Content-Type": "application/json" },
+        });
 
         setTimeout(() => {
           navigate("/landing", { state: { userData } });
